@@ -1,4 +1,4 @@
-gem 'test-unit' if RUBY_VERSION > "1.9"
+gem('test-unit') if RUBY_VERSION > "1.9"
 require 'test/unit'
 
 # Remove and reload TestLinkUpdate in case the test plan had been set by another test in the same environment

@@ -10,9 +10,20 @@ files = ["test_link_update.rb", "test_link_api.rb", "test_link_rspec.rb", "READM
 desc "Default: run unit tests"
 task :default => :test
 
-Rake::TestTask.new(:test) do |t|
-  t.pattern = "unit_tests/tc_*.rb"
-  t.verbose = true
+FileList['unit_tests/tc_*.rb'].each do |testfile|
+  taskname = testfile.gsub(/unit_tests\/tc_|\.rb\z/, '')
+  Rake::TestTask.new("test:#{taskname}") do |task|
+    task.pattern = testfile
+    task.verbose = false
+    task.loader = :direct
+  end
+end
+
+task :test do
+  FileList['unit_tests/tc_*.rb'].each do |testfile|
+    taskname = testfile.gsub(/unit_tests\/tc_|\.rb\z/, '')
+    Rake::Task["test:#{taskname}"].invoke
+  end
 end
 
 RDoc::Task.new do |rdoc|
@@ -23,11 +34,12 @@ end
 update_spec = Gem::Specification.new do |spec|
   spec.author = "Bob Saveland"
   spec.email = "savelandr@aol.com"
+  spec.homepage = "http://adsqa.office.aol.com/wiki/Category:Scripting"
   spec.platform = Gem::Platform::RUBY
   spec.description = "Test::Unit::TestCase and RSpec integration with TestLink test case tool"
   spec.summary = "TestLink module for Test::Unit and RSpec"
   spec.name = "test_link_update"
-  spec.version = "1.4.0"
+  spec.version = "1.4.1"
   spec.requirements << 'Test/Unit or MiniTest/Unit, or RSpec 2'
   spec.require_path = "."
   spec.extra_rdoc_files = ["README"]

@@ -165,6 +165,8 @@ Once you have created a test plan and build in TestLink and added the testcases,
   rspec array_spec.rb
 
 =Changelog
+===1.4.1
+- Fixed bug when creating suite in TestLink and the parent was an "only child"
 ===1.4.0
 - Updated API to work with TestLink 1.9.3.  This will not work with 1.8
 

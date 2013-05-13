@@ -110,10 +110,16 @@ class TestLinkAPI
       resp.each do |a|
         return a["id"].to_i if a["name"] == child_name
       end
-    # A hash is returned with 1.9
+    # Testlink 1.9 sucks.  If there are multiple children, it's a hash where the key is the id, and the value is another hash of the child
+    # If there is one child, there is no id as the key.  It's just a hash of the one child.  So good luck...
+    # I am testing the value of the first pair to see if it's a hash.
     elsif resp.is_a? Hash then
-      resp.each do |id, hash|
-        return hash["id"].to_i if hash["name"] == child_name
+      if resp.first[1].is_a? Hash then # many children
+        resp.each do |id, hash|
+          return hash["id"].to_i if hash["name"] == child_name
+        end
+      else # single child
+        return resp["id"].to_i if resp["name"] == child_name
       end
     end
     # If the suite wasn't found, return nil
