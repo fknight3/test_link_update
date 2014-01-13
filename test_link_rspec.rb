@@ -22,7 +22,13 @@ module RSpec
       if example_group.nil?
         ::RSpec::Core::ExampleGroup.children.map {|child| rspec_tests(child)}.flatten
       elsif example_group.children.empty?
-        example_group.examples.map {|x| "#{example_group.description} #{x.description}"}
+
+        # Check for Module/Class based example group description
+        if "#{example_group.description}".include? '::'
+          example_group.examples.map { |x| "It #{x.description}" }
+        else  
+          example_group.examples.map { |x| "#{example_group.description} #{x.description}"}
+        end
       else
         example_group.children.map {|c| rspec_tests(c)}.flatten.map {|d| "#{example_group.description} #{d}"}
       end
@@ -70,7 +76,14 @@ module RSpec
     class ExampleGroup
       def update_test_link_with_result
         test_plan = ENV["TEST_PLAN"]
-        test_name = "#{self.class.metadata[:example_group][:full_description]} #{self.example.description}"
+        
+        # Check for Module/Class based example group description
+        if "#{self.class.metadata[:example_group][:full_description]}".include? '::'
+          test_name = "It #{self.example.description}"
+        else
+          test_name = "#{self.class.metadata[:example_group][:full_description]} #{self.example.description}"
+        end
+        
         if test_plan && test_name
           tl = TestLinkAPI.new
           test_suite = ::RSpec::TestLink.test_suite
