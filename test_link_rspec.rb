@@ -26,11 +26,17 @@ module RSpec
         # Check for Module/Class based example group description
         if "#{example_group.description}".include? '::'
           example_group.examples.map { |x| "It #{x.description}" }
-        else  
+        else
           example_group.examples.map { |x| "#{example_group.description} #{x.description}"}
         end
       else
-        example_group.children.map {|c| rspec_tests(c)}.flatten.map {|d| "#{example_group.description} #{d}"}
+        
+        # Check for Module/Class based example group description
+        if "#{example_group.description}".include? '::'
+          example_group.children.map { |c| rspec_tests(c) }.flatten.map { |d| "#{d}" }
+        else
+          example_group.children.map { |c| rspec_tests(c)}.flatten.map { |d| "#{example_group.description} #{d}" }
+        end
       end
     end
 
