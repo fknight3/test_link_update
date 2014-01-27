@@ -12,7 +12,7 @@ module RSpec
       step = "Run automated test"
       expected = "Test should pass"
       rspec_tests.each do |test|
-        test_id = @tl.getTestCaseIDByName(test, @test_suite, @test_proj)
+        test_id = @tl.get_test_case_id_from_path(@test_proj, @test_folder_path, test)
         @tl.createTestCase(@test_proj, suite_id, test, description, step, expected, author_login) if test_id.nil?
       end
     end

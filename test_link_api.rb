@@ -132,4 +132,27 @@ class TestLinkAPI
     @tl.call("tl.getTestSuitesForTestSuite", args)
   end
 
+  def get_test_suite_id_from_path(test_project, test_folder_path)
+    suite_id = nil
+    folder_path=test_folder_path.clone
+    suite_id = getFirstLevelTestSuiteIDByName(folder_path.shift, test_project)
+    folder_path.each { |folder| suite_id = getChildTestSuiteIDByName(folder, suite_id)}
+    raise "Folder path does not exist in Testlink: #{test_project} -> #{test_folder_path.join(" -> ")}" if suite_id.nil?
+    return suite_id
+  end
+
+  def getTestCasesForTestSuite(test_suite_id)
+    raise ArgumentError, "Passed parameter is not Numeric: #{test_suite_id}" unless test_suite_id.is_a? Numeric
+    args={"devKey"=>@devkey, "testsuiteid"=>test_suite_id, "deep"=>false}
+    @tl.call("tl.getTestCasesForTestSuite", args)
+  end
+
+  def get_test_case_id_from_path(test_project, test_folder_path, test_case_name)
+    suite_id = get_test_suite_id_from_path(test_project, test_folder_path)
+    test_cases = getTestCasesForTestSuite(suite_id)
+    return nil if test_cases == "" #TestLink returns an empty string instead of an empty array, woohoo
+    test_case = test_cases.find {|test_case| test_case['name'] == test_case_name}
+    return nil if test_case.nil?
+    return test_case['id'].to_i
+  end
 end
