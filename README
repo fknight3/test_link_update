@@ -165,6 +165,8 @@ Once you have created a test plan and build in TestLink and added the testcases,
   rspec array_spec.rb
 
 =Changelog
+===1.4.4
+- added support for RDoc version 4
 ===1.4.3
 - added API method to get a test case ID from a folder path
 - changed rspec plugin to use this new method, to fix an issue where two folders with the same name couldn't have the same tests

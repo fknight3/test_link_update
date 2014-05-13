@@ -212,12 +212,16 @@ module TestLinkUpdate
         opt=RDoc::Options.new
         opt.files=[file]
         if File.exists?(file)
-          if RDoc::VERSION > "3" #RDoc keeps changing how you call the parser
-            parser = RDoc::RDoc.new
+          parser = RDoc::RDoc.new
+          if RDoc::VERSION > "4"
+            parser.store = RDoc::Store.new
+            parser.options = opt
+            parsed=parser.parse_files(opt.files).first.classes.find {|c| c.name == self.name}
+          elsif RDoc::VERSION > "3" #RDoc keeps changing how you call the parser
             parser.options = opt
             parsed=parser.parse_files(opt.files).first.classes.find {|c| c.name == self.name}
           else
-            parsed=RDoc::RDoc.new.parse_files(opt).first.classes.find {|c| c.name == self.name}
+            parsed=parser.parse_files(opt).first.classes.find {|c| c.name == self.name}
           end
         else
           puts "Cannot find file: #{file}.  Generic steps will be used"
@@ -243,6 +247,7 @@ module TestLinkUpdate
         comment = nil
       else
         comment = parsed.comment
+        comment = comment.text if comment.respond_to?(:text) #RDoc 4
       end
       comment = default_comment if comment.nil? || comment == ""
       comment_hash[self.name] = comment.gsub(TestLinkUpdate::POUND_SIGN, "<BR/>").gsub(TestLinkUpdate::LEADING_BR, "").strip
@@ -261,6 +266,7 @@ module TestLinkUpdate
         comment = ""
       else
         comment = comment.comment
+        comment = comment.text if comment.respond_to?(:text) #RDoc 4
       end
       # comment is now either "", or a real comment
       steps, expected = comment.split TestLinkUpdate::EXPECTED
