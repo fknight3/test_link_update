@@ -164,25 +164,3 @@ Once you have created a test plan and build in TestLink and added the testcases,
   export TEST_PLAN="my qar name"
   rspec array_spec.rb
 
-=Changelog
-===1.4.5
-- finally got it to add tests as automated execution
-===1.4.4
-- added support for RDoc version 4
-===1.4.3
-- added API method to get a test case ID from a folder path
-- changed rspec plugin to use this new method, to fix an issue where two folders with the same name couldn't have the same tests
-===1.4.2
-- Updated test_link_rspec.rb update_test_link_with_result and
-  insert_tests_to_testlink methods to check for module/class based example group
-  descriptions (denoted by description levels separated by '::') and replace them
-  with 'It '. This is for instances in which the subject of the test is indicated
-  by the test folder structure in TestLink.
-===1.4.1
-- Fixed bug when creating suite in TestLink and the parent was an "only child"
-===1.4.0
-- Updated API to work with TestLink 1.9.3.  This will not work with 1.8
-===1.3.0
-- Added ability to insert RSpec tests into testlink as well as update a test plan with execution result
-===1.2.0
-- Support for the Test::Unit stub that comes with Minitest in Ruby 1.9.  Also works with Minitest::TestCase
