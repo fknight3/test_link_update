@@ -7,8 +7,8 @@ You have to add your personal devkey from TestLink into the config.yaml file bef
 
 You need to have a dev key and the XMLRPC endpoint defined in a file in ```~/.test_link_update/config.yaml```  The format should look like this:
 
-> ```devkey: abcd123
-> endpoint: http://my.testlink.server/testlink/lib/api/xmlrpc.php```
+```devkey: abcd123
+endpoint: http://my.testlink.server/testlink/lib/api/xmlrpc.php```
 
 You can find your home directory by typing ```echo $HOME``` on linux, or ```echo %USERPROFILE%``` on Windows.  This is where you need to create the ```.test_link_update``` folder, and then place the ```config.yaml``` file.
 
