@@ -19,6 +19,7 @@ You can find your home directory by typing ```echo $HOME``` on linux, or ```echo
 Change your testcase to include the TestLinkUpdate module. You also have to define what TestLink project and folder structure the tests are a part of. Lastly, you need to call the update method in your teardown.
 
 **TestCase Before Update**
+
 ```
   require 'test/unit'
 
@@ -42,6 +43,7 @@ Change your testcase to include the TestLinkUpdate module. You also have to defi
 ```
 
 **TestCase After Update**
+
 ```
   require 'test/unit'
   require 'test_link_update'                    #<-- Require the module
@@ -71,6 +73,7 @@ Change your testcase to include the TestLinkUpdate module. You also have to defi
 
 ###Commenting your tests
 If you add comments to your test methods, they will get used as the test steps when inserted into TestLink. This is a good practice to document your automated tests, and also makes the TestLink tests more useful. I.e:
+
 ```
   # Create a new user, and make sure the response is successful
   def test_create_new_user
@@ -79,6 +82,7 @@ If you add comments to your test methods, they will get used as the test steps w
 ```
 
 Additionally, you can add steps and an expected result in such a way that they are added to TestLink separately. Just use "Expected:" on a new line of comment with a commented empty line between them. For example:
+
 ```
   # Create a new user with all required fields
   # Extract the status from the response
@@ -92,6 +96,7 @@ Additionally, you can add steps and an expected result in such a way that they a
 ##Using the module
 ###Inserting tests to TestLink
 To insert the tests into testlink, you simply need to call the class method TestLinkUpdate::ClassMethods#insert_tests_to_test_link with your testlink userid and the name of the file that contains the tests:
+
 ```
   require 'tc_demo'
   TcDemo.insert_tests_to_test_link("yourTestLinkID","tc_demo.rb")
@@ -102,11 +107,13 @@ The module will try to guess the file name if you use Ruby conventions.  For exa
 When inserting them, the comments that describe the class will be used for the test suite description. And the comments describing the test method will become the steps for the test case.
 ###Updating test results to TestLink
 Once you have created a test plan and build in TestLink and added the testcases, you can update the result by adding the -q parameter followed by the test plan (should be the QAR) name when running your test:
+
 ```
   ruby tc_demo.rb -- -q "my qar name"
 ```
 
 If you are using MiniTest's Test::Unit, it does not pass command-line parameters to the tests.  So you will need to set the environment variable "TEST_PLAN":
+
 ```
   export TEST_PLAN#"my qar name"
   ruby tc_demo.rb
@@ -117,6 +124,7 @@ If you are using MiniTest's Test::Unit, it does not pass command-line parameters
 ##Update your tests
 Change your spec to include the TestLinkUpdate module.  You also have to define what TestLink project and folder structure the tests are a part of.  Lastly, you need to call the update method in your teardown.
 **Spec Before Update**
+
 ```
   describe "Ruby core class" do
     describe Array do
@@ -135,6 +143,7 @@ Change your spec to include the TestLinkUpdate module.  You also have to define 
 ```
 
 **Spec After Update**
+
 ```
   require 'test_link_rspec'                                   #<-- Require the plugin
   RSpec::TestLink.set_tree_path ["My Project", "My Folder"]   #<-- Set up the project and folder path that aligns with TestLink
@@ -163,6 +172,7 @@ Change your spec to include the TestLinkUpdate module.  You also have to define 
 ###Inserting tests to TestLink
 To insert the tests into testlink, you simply need to call the method **insert_tests_to_testlink** with your testlink 
 userid.  This is easily done in IRB:
+
 ```
   require 'array_spec'
   RSpec::TestLink.insert_tests_to_test_link("yourTestLinkID")
@@ -176,6 +186,7 @@ Because of the way the tests are inserted without executing, this will not work 
 
 ###Updating test results to TestLink
 Once you have created a test plan and build in TestLink and added the testcases, you can update the result by adding an environment variable "TEST_PLAN" with the value of the test plan (should be the QAR) name:
+
 ```
   export TEST_PLAN#"my qar name"
   rspec array_spec.rb
