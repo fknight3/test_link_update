@@ -62,7 +62,7 @@ class TestLinkAPI
   def createTestCase(test_project, testsuiteid, testcasename, summary, steps, expectedresults, authorlogin)
     proj_id = test_project.is_a?(Numeric) ? test_project : getProjectIDByName(test_project)
     step = {"actions" => steps, "expected_results" => expectedresults, "step_number" => 1, "execution_type" => 2}
-    args={"devKey"=>@devkey, "executionType"=>2, "testprojectid"=>proj_id, "testsuiteid"=>testsuiteid, "testcasename"=>testcasename, "summary"=>summary, "steps"=>[step], "authorlogin"=>authorlogin}
+    args={"devKey"=>@devkey, "executiontype"=>2, "testprojectid"=>proj_id, "testsuiteid"=>testsuiteid, "testcasename"=>testcasename, "summary"=>summary, "steps"=>[step], "authorlogin"=>authorlogin}
     res=@tl.call("tl.createTestCase", args)
     res
   end

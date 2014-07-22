@@ -165,6 +165,8 @@ Once you have created a test plan and build in TestLink and added the testcases,
   rspec array_spec.rb
 
 =Changelog
+===1.4.5
+- finally got it to add tests as automated execution
 ===1.4.4
 - added support for RDoc version 4
 ===1.4.3

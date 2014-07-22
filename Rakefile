@@ -5,8 +5,8 @@ require 'rdoc/task'
 require 'rake/packagetask'
 require 'rubygems/package_task'
 
-rdoc_opts = ["--main", "README", "--exclude", "unit_tests/"]
-files = ["test_link_update.rb", "test_link_api.rb", "test_link_rspec.rb", "README", "config.yaml"]
+rdoc_opts = ["--main", "README.txt", "--exclude", "unit_tests/"]
+files = ["test_link_update.rb", "test_link_api.rb", "test_link_rspec.rb", "README.txt", "README.md", "config.yaml"]
 desc "Default: run unit tests"
 task :default => :test
 
@@ -27,7 +27,7 @@ task :test do
 end
 
 RDoc::Task.new do |rdoc|
-  rdoc.main = "README"
+  rdoc.main = "README.txt"
   rdoc.rdoc_files = files
 end
 
@@ -39,10 +39,10 @@ update_spec = Gem::Specification.new do |spec|
   spec.description = "Test::Unit::TestCase and RSpec integration with TestLink test case tool"
   spec.summary = "TestLink module for Test::Unit and RSpec"
   spec.name = "test_link_update"
-  spec.version = "1.4.4"
+  spec.version = "1.4.5"
   spec.requirements << 'Test/Unit or MiniTest/Unit, or RSpec 2'
   spec.require_path = "."
-  spec.extra_rdoc_files = ["README"]
+  spec.extra_rdoc_files = ["README.txt"]
   spec.rdoc_options = rdoc_opts
   spec.files = files
   spec.test_files = Dir.glob('unit_tests/tc_*.rb')
