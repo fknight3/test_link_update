@@ -130,11 +130,11 @@ Change your spec to include the TestLinkUpdate module.  You also have to define 
     describe Array do
       describe "with no elements" do
         it "should be empty" do
-          a # Array.new
+          a = Array.new
           a.should be_empty
         end
         it "should have a length of zero" do
-          a # Array.new
+          a = Array.new
           a.length.should be(0)
         end
       end
