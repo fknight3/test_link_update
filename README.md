@@ -156,11 +156,11 @@ Change your spec to include the TestLinkUpdate module.  You also have to define 
     describe Array do
       describe "with no elements" do
         it "should be empty" do
-          a # Array.new
+          a = Array.new
           a.should be_empty
         end
         it "should have a length of zero" do
-          a # Array.new
+          a = Array.new
           a.length.should be(0)
         end
       end
@@ -188,7 +188,7 @@ Because of the way the tests are inserted without executing, this will not work 
 Once you have created a test plan and build in TestLink and added the testcases, you can update the result by adding an environment variable "TEST_PLAN" with the value of the test plan (should be the QAR) name:
 
 ```
-  export TEST_PLAN#"my qar name"
+  export TEST_PLAN="my qar name"
   rspec array_spec.rb
 ```
 
