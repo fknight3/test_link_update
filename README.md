@@ -115,7 +115,7 @@ Once you have created a test plan and build in TestLink and added the testcases,
 If you are using MiniTest's Test::Unit, it does not pass command-line parameters to the tests.  So you will need to set the environment variable "TEST_PLAN":
 
 ```
-  export TEST_PLAN#"my qar name"
+  export TEST_PLAN="my qar name"
   ruby tc_demo.rb
 ```
 
