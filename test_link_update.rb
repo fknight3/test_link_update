@@ -20,7 +20,7 @@ module TestLinkUpdate
     # Update result if all needed data exists
     if updateable?
       tl=TestLinkAPI.new
-      tcid = tl.getTestCaseIDByName(tst_case_name, tst_suite_name, tst_project_name)
+      tcid=@tl.get_test_case_id_from_path(@test_proj, @test_folder_path, tst_case_name)
       # initialize cache, if it's not already
       @@id_cache = Hash.new unless defined?(@@id_cache)
       # check the cache, or get ID's if they aren't cached
@@ -123,7 +123,7 @@ module TestLinkUpdate
       #Get all tests, and add each one to the suite
       get_test_names.each do |tc|
         #Check if test exists already
-        tcid=@tl.getTestCaseIDByName(tc, tst_suite_name, @test_proj)
+        tcid=@tl.get_test_case_id_from_path(@test_proj, @test_folder_path, tc)
         #Add test if it doesn't exist
         
         # get comments for test
