@@ -20,7 +20,7 @@ module TestLinkUpdate
     # Update result if all needed data exists
     if updateable?
       tl=TestLinkAPI.new
-      tcid=tl.get_test_case_id_from_path(@test_proj, @test_folder_path, tst_case_name)
+      tcid=tl.get_test_case_id_from_path(tst_project_name, (tst_folder_path + [tst_suite_name]), tst_case_name)
       # initialize cache, if it's not already
       @@id_cache = Hash.new unless defined?(@@id_cache)
       # check the cache, or get ID's if they aren't cached
@@ -93,6 +93,12 @@ module TestLinkUpdate
     self.class.instance_variable_get("@test_proj")
   end
 
+  # Return the test path
+  # Can't start with "test" or it will run as a test
+  def tst_folder_path
+    self.class.instance_variable_get("@test_folder_path")
+  end
+
   # Return the test suite name
   # Can't start with "test" or it will run as a test
   def tst_suite_name
@@ -123,7 +129,7 @@ module TestLinkUpdate
       #Get all tests, and add each one to the suite
       get_test_names.each do |tc|
         #Check if test exists already
-        tcid=@tl.get_test_case_id_from_path(@test_proj, @test_folder_path, tc)
+        tcid=@tl.get_test_case_id_from_path(@test_proj, (@test_folder_path + [tst_suite_name]), tc)
         #Add test if it doesn't exist
         
         # get comments for test
