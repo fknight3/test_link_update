@@ -20,7 +20,7 @@ module TestLinkUpdate
     # Update result if all needed data exists
     if updateable?
       tl=TestLinkAPI.new
-      tcid=@tl.get_test_case_id_from_path(@test_proj, @test_folder_path, tst_case_name)
+      tcid=tl.get_test_case_id_from_path(@test_proj, @test_folder_path, tst_case_name)
       # initialize cache, if it's not already
       @@id_cache = Hash.new unless defined?(@@id_cache)
       # check the cache, or get ID's if they aren't cached
