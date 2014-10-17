@@ -20,15 +20,20 @@ module TestLinkUpdate
     # Update result if all needed data exists
     if updateable?
       tl=TestLinkAPI.new
-      tcid=tl.get_test_case_id_from_path(tst_project_name, (tst_folder_path + [tst_suite_name]), tst_case_name)
       # initialize cache, if it's not already
-      @@id_cache = Hash.new unless defined?(@@id_cache)
-      # check the cache, or get ID's if they aren't cached
-      tpid = @@id_cache[tst_plan_name] || tl.getTestPlanIDByName(tst_plan_name, tst_project_name)
-      bid = (@@id_cache[tst_plan_name + ":build"] || tl.getLatestBuildIDForTestPlan(tpid)) unless tpid.nil?
-      # cache the plan ID and build ID
-      @@id_cache[tst_plan_name] = tpid
-      @@id_cache[tst_plan_name + ":build"] = bid
+      unless defined?(@@id_cache)
+        @@id_cache = Hash.new unless defined?(@@id_cache)
+        #populate all test cases into cache
+        test_cases = tl.get_test_case_ids_from_path(tst_project_name, (tst_folder_path + [tst_suite_name]))
+        test_cases.each {|name, id| @@id_cache[name] = id}
+        tcid = @@id_cache[tst_case_name]
+        # cache the plan ID and build ID
+        tpid = @@id_cache[tst_plan_name] = tl.getTestPlanIDByName(tst_plan_name, tst_project_name)
+        @@id_cache[tst_plan_name + ":build"] = tl.getLatestBuildIDForTestPlan(tpid) unless tpid.nil?
+      end
+      tcid = @@id_cache[tst_case_name]
+      tpid = @@id_cache[tst_plan_name]
+      bid = @@id_cache[tst_plan_name + ":build"]
       tl.reportTCResult(tcid, tpid, tst_result, bid, run_notes) unless tcid.nil? || tpid.nil? || bid.nil?
     end
   end

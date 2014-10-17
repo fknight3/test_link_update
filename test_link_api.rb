@@ -147,6 +147,13 @@ class TestLinkAPI
     @tl.call("tl.getTestCasesForTestSuite", args)
   end
 
+  def get_test_case_ids_from_path(test_project, test_folder_path)
+    suite_id = get_test_suite_id_from_path(test_project, test_folder_path)
+    test_cases = getTestCasesForTestSuite(suite_id)
+    return {} if test_cases == "" #TestLink returns an empty string instead of an empty array, woohoo
+    test_cases.inject({}) {|hash, test_case| hash[test_case['name']] = test_case['id'].to_i; hash}
+  end
+
   def get_test_case_id_from_path(test_project, test_folder_path, test_case_name)
     suite_id = get_test_suite_id_from_path(test_project, test_folder_path)
     test_cases = getTestCasesForTestSuite(suite_id)

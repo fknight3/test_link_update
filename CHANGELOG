@@ -1,3 +1,7 @@
+===1.4.7
+- added testcase ID to cache for test/unit plugin, to reduce the number of API calls when updating a test plan
+===1.4.6
+- changed testunit plugin to use previous addition of getting test case from folder path
 ===1.4.5
 - finally got it to add tests as automated execution
 ===1.4.4

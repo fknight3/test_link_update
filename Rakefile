@@ -39,7 +39,7 @@ update_spec = Gem::Specification.new do |spec|
   spec.description = "Test::Unit::TestCase and RSpec integration with TestLink test case tool"
   spec.summary = "TestLink module for Test::Unit and RSpec"
   spec.name = "test_link_update"
-  spec.version = "1.4.6"
+  spec.version = "1.4.7"
   spec.requirements << 'Test/Unit or MiniTest/Unit, or RSpec 2'
   spec.require_path = "."
   spec.extra_rdoc_files = ["README.txt"]
