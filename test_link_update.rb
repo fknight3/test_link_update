@@ -2,7 +2,7 @@ require 'test_link_api'
 require 'optparse'
 
 # This module is designed to be loaded into a Test::Unit::TestCase child.  It enables
-# the tests to be easily inserted into TestLink, with the class name as the suite, and 
+# the tests to be easily inserted into TestLink, with the class name as the suite, and
 # the class methods as each test case.  It also can update a test plan with the result
 # of an execution.
 #
@@ -11,47 +11,47 @@ require 'optparse'
 module TestLinkUpdate
   POUND_SIGN = /(\n|^)#[\s]*/ # matches any "^#" or "\n#" plus any whitespace after
   LEADING_BR = /^<BR\/>/ # matches and breaks at the start of a string
-  #EXPECTED = /#\n#[\s]*Expected:/ # split on blank comment line followed by word "Expected:"
+  # EXPECTED = /#\n#[\s]*Expected:/ # split on blank comment line followed by word "Expected:"
   EXPECTED = /\n[\s]*\n[\s]*Expected:/ # split on blank comment line followed by word "Expected:"
 
   def update_test_link_with_result
-    parse_test_plan #get the test plan name, if provided
+    parse_test_plan # get the test plan name, if provided
 
     # Update result if all needed data exists
     if updateable?
-      tl=TestLinkAPI.new
+      tl = TestLinkAPI.new
       # initialize cache, if it's not already
       unless defined?(@@id_cache)
-        @@id_cache = Hash.new unless defined?(@@id_cache)
-        #populate all test cases into cache
+        @@id_cache = {} unless defined?(@@id_cache)
+        # populate all test cases into cache
         test_cases = tl.get_test_case_ids_from_path(tst_project_name, (tst_folder_path + [tst_suite_name]))
-        test_cases.each {|name, id| @@id_cache[name] = id}
+        test_cases.each { |name, id| @@id_cache[name] = id }
         tcid = @@id_cache[tst_case_name]
         # cache the plan ID and build ID
         tpid = @@id_cache[tst_plan_name] = tl.getTestPlanIDByName(tst_plan_name, tst_project_name)
-        @@id_cache[tst_plan_name + ":build"] = tl.getLatestBuildIDForTestPlan(tpid) unless tpid.nil?
+        @@id_cache[tst_plan_name + ':build'] = tl.getLatestBuildIDForTestPlan(tpid) unless tpid.nil?
       end
       tcid = @@id_cache[tst_case_name]
       tpid = @@id_cache[tst_plan_name]
-      bid = @@id_cache[tst_plan_name + ":build"]
+      bid = @@id_cache[tst_plan_name + ':build']
       tl.reportTCResult(tcid, tpid, tst_result, bid, run_notes) unless tcid.nil? || tpid.nil? || bid.nil?
     end
   end
 
   def run_notes
-    notes = ""
-    result = instance_variable_get :@_result #Test::Unit::TestResult which accumulates
-    fault = result.faults.find {|f| f.test_name == name} if result
+    notes = ''
+    result = instance_variable_get :@_result # Test::Unit::TestResult which accumulates
+    fault = result.faults.find { |f| f.test_name == name } if result
     notes << fault.to_s if fault # if there is a fault
     notes << "\n#{@test_notes}" if @test_notes
-    return notes
+    notes
   end
 
   # alias for update_test_link_with_result
   def updateTestLinkWithResult(*args)
     update_test_link_with_result *args
   end
-  
+
   # Add class methods into including class
   def self.included(klass)
     klass.extend ClassMethods
@@ -61,17 +61,17 @@ module TestLinkUpdate
   def updateable?
     return false if tst_plan_name.nil?
     return false if tst_project_name.nil?
-    return true
+    true
   end
 
   # Parse the test plan from the command line arguments
   def parse_test_plan
     if !defined?(@@test_plan) || @@test_plan.nil?
-      @@test_plan = ENV["TEST_PLAN"]
+      @@test_plan = ENV['TEST_PLAN']
       # fix for newer test::unit which leaves "--" on ARGV
-      ARGV.delete("--")
+      ARGV.delete('--')
       OptionParser.new do |opts|
-        opts.on("-q QAR", String) {|val| @@test_plan=val}
+        opts.on('-q QAR', String) { |val| @@test_plan = val }
       end.parse!
     end
   end
@@ -95,13 +95,13 @@ module TestLinkUpdate
   # Return the test project name
   # Can't start with "test" or it will run as a test
   def tst_project_name
-    self.class.instance_variable_get("@test_proj")
+    self.class.instance_variable_get('@test_proj')
   end
 
   # Return the test path
   # Can't start with "test" or it will run as a test
   def tst_folder_path
-    self.class.instance_variable_get("@test_folder_path")
+    self.class.instance_variable_get('@test_folder_path')
   end
 
   # Return the test suite name
@@ -113,7 +113,7 @@ module TestLinkUpdate
   # Return the result as "p" or "f", for use by testlink api
   # Can't start with "test" or it will run as a test
   def tst_result
-    passed? ? "p" : "f"
+    passed? ? 'p' : 'f'
   end
 
   # Methods for the including class
@@ -122,35 +122,46 @@ module TestLinkUpdate
 
     # Checks to see if the tests exist, and if not, it creates a folder and adds them
     # It requires you to put in your testlink login because testlink is stupid
-    def insert_tests_to_test_link(authorLogin, file=nil)
+    def insert_tests_to_test_link(authorLogin, file = nil)
       # Guess the filename if it is nil
-      file = underscore(self.name) + ".rb" if file.nil?
-      #Parse out the comments
-      comment_hash=parse_comments(file)
+      file = underscore(name) + '.rb' if file.nil?
+      # Parse out the comments
+      comment_hash = parse_comments(file)
 
-      @tl=TestLinkAPI.new
+      @tl = TestLinkAPI.new
       suite_comment = comment_hash[tst_suite_name]
-      tsid=get_or_create_suite_id(tst_suite_name, suite_comment)
-      #Get all tests, and add each one to the suite
+      tsid = get_or_create_suite_id(tst_suite_name, suite_comment)
+      # Get all tests, and add each one to the suite
       get_test_names.each do |tc|
-        #Check if test exists already
-        tcid=@tl.get_test_case_id_from_path(@test_proj, (@test_folder_path + [tst_suite_name]), tc)
-        #Add test if it doesn't exist
-        
+        # Check if test exists already
+        tcid = @tl.get_test_case_id_from_path(@test_proj, (@test_folder_path + [tst_suite_name]), tc)
+        # Add test if it doesn't exist
+
         # get comments for test
         comment = comment_hash[tc]
+        @tl.createTestCase(@test_proj, tsid, tc, 'Test from Test/Unit TestCase', comment['steps'], comment['expected'], authorLogin) if tcid.nil?
 
-        @tl.createTestCase(@test_proj, tsid, tc, "Test from Test/Unit TestCase", comment["steps"], comment["expected"], authorLogin) if tcid.nil?
+        if defined? @testlink_params
+          apiArgs = {'Automation Type': @testlink_params['automation_type']}
+          if @testlink_params.key?('jira_story')
+            apiArgs['JIRA Story'] = @testlink_params['jira_story']
+          end
+          @tl.updateTestCaseCustomFieldDesignValue(
+              @testlink_params['project_prefix'] + testcaseresponse[0]['additionalInfo']['external_id'], 1, 1, apiArgs)
+          if @testlink_params.key?('keywords')
+            @tl.addTestCaseKeywords({@testlink_params['project_prefix'] + response[0]['additionalInfo']['external_id']=> @testlink_params['keywords']})
+          end
+        end
       end
       nil
     end
 
     # Return array of tests from MiniTest or Test/Unit TestCase
     def get_test_names
-      if defined?(MiniTest::Unit::TestCase) && self.ancestors.include?(MiniTest::Unit::TestCase)
-        self.test_methods
+      if defined?(MiniTest::Unit::TestCase) && ancestors.include?(MiniTest::Unit::TestCase)
+        test_methods
       else
-       self.suite.tests.map {|t| t.method_name}
+        suite.tests.map(&:method_name)
       end
     end
 
@@ -161,14 +172,14 @@ module TestLinkUpdate
 
     # Populate the test_project and folder_path variables
     def set_tree_path(tree_path)
-      if tree_path.is_a? String then
+      if tree_path.is_a? String
         @test_proj = tree_path
         @test_folder_path = []
-      elsif tree_path.is_a? Array then
+      elsif tree_path.is_a? Array
         @test_proj = tree_path.shift
         @test_folder_path = tree_path
       else
-        raise ArgumentError, "Must send a String or Array of Strings"
+        raise ArgumentError, 'Must send a String or Array of Strings'
       end
     end
 
@@ -180,59 +191,58 @@ module TestLinkUpdate
     # Helper method to resolve the folder path into a suite Id
     # If the Suite doesn't exist, create it
     # Returns the ID of the suite
-    def get_or_create_suite_id(suite_name, suite_comment_if_new=nil)
+    def get_or_create_suite_id(suite_name, suite_comment_if_new = nil)
       parent_id = nil
       suite_id = nil
       # Two cases, either there's a folder path, or there isn't
       # If there is, we will find the parent folder ID
       # In either case, we will find the suite ID if it already exists
-      if @test_folder_path.nil? || @test_folder_path.empty? then
+      if @test_folder_path.nil? || @test_folder_path.empty?
         suite_id = @tl.getFirstLevelTestSuiteIDByName(suite_name, @test_proj)
       else
-        folder_path=@test_folder_path.clone #We will perform destructive actions on this array, so copy it
+        folder_path = @test_folder_path.clone # We will perform destructive actions on this array, so copy it
         parent_id = @tl.getFirstLevelTestSuiteIDByName(folder_path.shift, @test_proj)
-        folder_path.each { |folder| parent_id = @tl.getChildTestSuiteIDByName(folder, parent_id)}
-        raise "Folder path does not exist in Testlink: #{@test_proj} -> #{@test_folder_path.join(" -> ")}" if parent_id.nil?
+        folder_path.each { |folder| parent_id = @tl.getChildTestSuiteIDByName(folder, parent_id) }
+        raise "Folder path does not exist in Testlink: #{@test_proj} -> #{@test_folder_path.join(' -> ')}" if parent_id.nil?
         suite_id = @tl.getChildTestSuiteIDByName(suite_name, parent_id)
       end
 
       # If the suite_id is nil, the suite needs to be created
-      suite_id = @tl.createTestSuite(suite_name, @test_proj, suite_comment_if_new, parent_id).first["id"] if suite_id.nil?
+      suite_id = @tl.createTestSuite(suite_name, @test_proj, suite_comment_if_new, parent_id).first['id'] if suite_id.nil?
 
-      return suite_id.to_i
+      suite_id.to_i
     end
-#    private :getSuiteId
-
+    #    private :getSuiteId
 
     # Uses RDoc to parse out the comments associated with each method and the class,
     # then puts them in a more useable hash.
     def parse_comments(file)
-      comment_hash = Hash.new
-      oldverbose=$VERBOSE
+      comment_hash = {}
+      oldverbose = $VERBOSE
       # RDoc included with ruby 1.8.x won't load in IRB
       # so comments will not get populated.  You can install
       # a newer RDoc via gem, or use Ruby 1.9+.
       begin
-        $VERBOSE=nil
+        $VERBOSE = nil
         require 'rdoc/rdoc'
       rescue NameError
         # If RDoc fails to load, use generic test descriptions instead
-        puts "Cannot load RDoc.  Generic steps will be used"
+        puts 'Cannot load RDoc.  Generic steps will be used'
         parsed = nil
       else
-        opt=RDoc::Options.new
-        opt.files=[file]
-        if File.exists?(file)
+        opt = RDoc::Options.new
+        opt.files = [file]
+        if File.exist?(file)
           parser = RDoc::RDoc.new
-          if RDoc::VERSION > "4"
+          if RDoc::VERSION > '4'
             parser.store = RDoc::Store.new
             parser.options = opt
-            parsed=parser.parse_files(opt.files).first.classes.find {|c| c.name == self.name}
-          elsif RDoc::VERSION > "3" #RDoc keeps changing how you call the parser
+            parsed = parser.parse_files(opt.files).first.classes.find { |c| c.name == name }
+          elsif RDoc::VERSION > '3' # RDoc keeps changing how you call the parser
             parser.options = opt
-            parsed=parser.parse_files(opt.files).first.classes.find {|c| c.name == self.name}
+            parsed = parser.parse_files(opt.files).first.classes.find { |c| c.name == name }
           else
-            parsed=parser.parse_files(opt).first.classes.find {|c| c.name == self.name}
+            parsed = parser.parse_files(opt).first.classes.find { |c| c.name == name }
           end
         else
           puts "Cannot find file: #{file}.  Generic steps will be used"
@@ -247,60 +257,58 @@ module TestLinkUpdate
           set_test_comment(comment_hash, parsed, test)
         end
       end
-      $VERBOSE=oldverbose
-      return comment_hash
-
+      $VERBOSE = oldverbose
+      comment_hash
     end
 
     def set_suite_comment(comment_hash, parsed)
-      default_comment = "Test Suite generated from Test::Unit::TestCase"
+      default_comment = 'Test Suite generated from Test::Unit::TestCase'
       if parsed.nil?
         comment = nil
       else
         comment = parsed.comment
-        comment = comment.text if comment.respond_to?(:text) #RDoc 4
+        comment = comment.text if comment.respond_to?(:text) # RDoc 4
       end
-      comment = default_comment if comment.nil? || comment == ""
-      comment_hash[self.name] = comment.gsub(TestLinkUpdate::POUND_SIGN, "<BR/>").gsub(TestLinkUpdate::LEADING_BR, "").strip
+      comment = default_comment if comment.nil? || comment == ''
+      comment_hash[name] = comment.gsub(TestLinkUpdate::POUND_SIGN, '<BR/>').gsub(TestLinkUpdate::LEADING_BR, '').strip
     end
     private :set_suite_comment
 
     def set_test_comment(comment_hash, parsed, method)
-      default_steps = "Run automated test"
-      default_expected = "Test should pass"
+      default_steps = 'Run automated test'
+      default_expected = 'Test should pass'
       comment = nil
       unless parsed.nil?
-        comment = parsed.method_list.find {|m| m.name == method}
+        comment = parsed.method_list.find { |m| m.name == method }
       end
       # comment is now either nil, or the method rdoc object
       if comment.nil?
-        comment = ""
+        comment = ''
       else
         comment = comment.comment
-        comment = comment.text if comment.respond_to?(:text) #RDoc 4
+        comment = comment.text if comment.respond_to?(:text) # RDoc 4
       end
       # comment is now either "", or a real comment
       steps, expected = comment.split TestLinkUpdate::EXPECTED
       steps ||= default_steps
-      steps.gsub!("\n", "<BR/>") #Darkfish generator doesn't use breaks, but TestLink needs them for proper spacing
+      steps.gsub!("\n", '<BR/>') # Darkfish generator doesn't use breaks, but TestLink needs them for proper spacing
       expected ||= default_expected
-      expected.gsub!("\n", "<BR/>") #Darkfish generator doesn't use breaks, but TestLink needs them for proper spacing
-      comment_hash[method] = {"steps" => steps.gsub(TestLinkUpdate::POUND_SIGN, "<BR/>").gsub(TestLinkUpdate::LEADING_BR, "").strip, "expected" => expected.gsub(TestLinkUpdate::POUND_SIGN, "<BR/>").gsub(TestLinkUpdate::LEADING_BR, "").strip}
+      expected.gsub!("\n", '<BR/>') # Darkfish generator doesn't use breaks, but TestLink needs them for proper spacing
+      comment_hash[method] = { 'steps' => steps.gsub(TestLinkUpdate::POUND_SIGN, '<BR/>').gsub(TestLinkUpdate::LEADING_BR, '').strip, 'expected' => expected.gsub(TestLinkUpdate::POUND_SIGN, '<BR/>').gsub(TestLinkUpdate::LEADING_BR, '').strip }
     end
     private :set_test_comment
 
     def underscore(camel_cased_word)
-      camel_cased_word.to_s.gsub(/::/, '/').
-       gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-       gsub(/([a-z\d])([A-Z])/,'\1_\2').
-       tr("-", "_").
-       downcase
+      camel_cased_word.to_s.gsub(/::/, '/')
+                      .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
+                      .gsub(/([a-z\d])([A-Z])/, '\1_\2')
+                      .tr('-', '_')
+                      .downcase
     end
     private :underscore
 
     def tst_suite_name
-      self.name
+      name
     end
-  end #ClassMethods
-  
-end #TestLinkUpdate
+  end # ClassMethods
+end # TestLinkUpdate
